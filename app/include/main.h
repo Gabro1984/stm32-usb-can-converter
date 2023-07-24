@@ -28,6 +28,7 @@
 #include "usbd_desc.h"
 /* #include "usbd_customhid.h" */
 #include "usbd_customhid_if.h"
+#include "can_conf.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/

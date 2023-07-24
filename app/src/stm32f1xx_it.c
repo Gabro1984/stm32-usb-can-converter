@@ -31,6 +31,7 @@
 /* Private variables --------------------------------------------------------- */
 extern PCD_HandleTypeDef hpcd;
 extern USBD_HandleTypeDef USBD_Device;
+extern CAN_HandleTypeDef     CanHandle;
 
 /* Private function prototypes ----------------------------------------------- */
 /* Private functions --------------------------------------------------------- */
@@ -149,9 +150,14 @@ void SysTick_Handler(void)
   * @param  None
   * @retval None
   */
-void USB_LP_CAN1_RX0_IRQHandler(void)
+void OTG_FS_IRQHandler(void)
 {
   HAL_PCD_IRQHandler(&hpcd);
+}
+
+void CAN1_RX0_IRQHandler(void)
+{
+  HAL_CAN_IRQHandler(&CanHandle);
 }
 
 /**

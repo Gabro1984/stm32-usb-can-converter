@@ -50,8 +50,6 @@ int main(void)
    */
   HAL_Init();
 
-  /* Configure the system clock to 72 MHz */
-  /* TODO: */
   SystemClock_Config();
 
   /* Init Device Library */
@@ -116,8 +114,6 @@ void SystemClock_Config(void)
 
   /* USB clock selection */
   rccperiphclkinit.PeriphClockSelection = RCC_PERIPHCLK_USB;
-  /*TODO: check USB clocks replace RCC_USBCLKSOURCE_PLL_DIV1_5 by
-      RCC_USBCLKSOURCE_PLL_DIV3*/
   rccperiphclkinit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV3;
   HAL_RCCEx_PeriphCLKConfig(&rccperiphclkinit);
 

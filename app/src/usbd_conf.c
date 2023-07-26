@@ -65,15 +65,10 @@ void HAL_PCD_MspInit(PCD_HandleTypeDef * hpcd)
   /* Enable USB Clock */
   __HAL_RCC_USB_OTG_FS_CLK_ENABLE();
 
-  /* Set USB Interrupt priority */
-  HAL_NVIC_SetPriority(USB_LP_CAN1_RX0_IRQn, 3, 0);
-
   /* Enable USB Interrupt */
-  HAL_NVIC_EnableIRQ(USB_LP_CAN1_RX0_IRQn);
 
-  /* TODO: */
-  /* HAL_NVIC_SetPriority(OTG_FS_IRQn, 0, 0); */
-  /* HAL_NVIC_EnableIRQ(OTG_FS_IRQn); */
+  HAL_NVIC_SetPriority(OTG_FS_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(OTG_FS_IRQn);
 }
 
 /**
@@ -83,14 +78,9 @@ void HAL_PCD_MspInit(PCD_HandleTypeDef * hpcd)
   */
 void HAL_PCD_MspDeInit(PCD_HandleTypeDef * hpcd)
 {
-  /* Disable USB FS Clock */
-    /* TODO: */
-  /* __HAL_RCC_USB_CLK_DISABLE(); */
-        /* HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9); */
-
-    /* Peripheral interrupt Deinit*/
-    /* HAL_NVIC_DisableIRQ(OTG_FS_IRQn); */
     __HAL_RCC_USB_OTG_FS_CLK_DISABLE();
+    /* Peripheral interrupt Deinit*/
+    HAL_NVIC_DisableIRQ(OTG_FS_IRQn);
 }
 
 /*******************************************************************************
@@ -227,32 +217,27 @@ void HAL_PCD_DisconnectCallback(PCD_HandleTypeDef * hpcd)
   */
 USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef * pdev)
 {
-  /* Set LL Driver parameters */
-  hpcd.Instance = USB_OTG_FS;
-  hpcd.Init.dev_endpoints = 8;
-  hpcd.Init.phy_itface = PCD_PHY_EMBEDDED;
-  hpcd.Init.speed = PCD_SPEED_FULL;
-  hpcd.Init.low_power_enable = 0;
+    /* Link The driver to the stack */
+    hpcd.pData = pdev;
+    pdev->pData = &hpcd;
 
-  /* Link The driver to the stack */
-  hpcd.pData = pdev;
-  pdev->pData = &hpcd;
+    hpcd.Instance = USB_OTG_FS;
+    hpcd.Init.dev_endpoints = 7;
+    hpcd.Init.speed = PCD_SPEED_FULL;
+    //hpcd.Init.ep0_mps = DEP0CTL_MPS_64;
+    hpcd.Init.Sof_enable = DISABLE;
+    hpcd.Init.low_power_enable = DISABLE;
+    hpcd.Init.vbus_sensing_enable = DISABLE;
 
-  /* Initialize LL Driver */
-  if( HAL_PCD_Init((PCD_HandleTypeDef *) pdev->pData) != HAL_OK) {
-      //Error_Handler();
-  }
+    /* Initialize LL Driver */
+    if( HAL_PCD_Init((PCD_HandleTypeDef *) pdev->pData) != HAL_OK) {
+	Error_Handler();
+    }
 
-  /* TODO: */
-  /* HAL_PCDEx_PMAConfig(pdev->pData, 0x00, PCD_SNG_BUF, 0x18); */
-  /* HAL_PCDEx_PMAConfig(pdev->pData, 0x80, PCD_SNG_BUF, 0x58); */
-  /* HAL_PCDEx_PMAConfig(pdev->pData, CUSTOM_HID_EPIN_ADDR, PCD_SNG_BUF, 0x98); */
-  /* HAL_PCDEx_PMAConfig(pdev->pData, CUSTOM_HID_EPOUT_ADDR, PCD_SNG_BUF, 0xD8); */
-  HAL_PCDEx_SetRxFiFo(&hpcd, 0x40);
-  HAL_PCDEx_SetTxFiFo(&hpcd, 0, 0x40);
-  HAL_PCDEx_SetTxFiFo(&hpcd, 1, 0x40);
-
-  return USBD_OK;
+    HAL_PCDEx_SetRxFiFo(&hpcd, 0x40);
+    HAL_PCDEx_SetTxFiFo(&hpcd, 0, 0x40);
+    HAL_PCDEx_SetTxFiFo(&hpcd, 1, 0x40);
+    return USBD_OK;
 }
 
 /**

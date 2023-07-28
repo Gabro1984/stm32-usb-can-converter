@@ -52,6 +52,14 @@ int main(void)
 
   SystemClock_Config();
 
+  /* Init LEDs*/
+  BSP_LED_Init(LED1);
+  BSP_LED_Init(LED2);
+  BSP_LED_Init(LED3);
+
+  /* TODO: hack for debug purposes. Need to remove in production.*/
+  TURN_ON_USB_DEVICE();
+
   /* Init Device Library */
   USBD_Init(&USBD_Device, &HID_Desc, 0);
 
@@ -65,7 +73,7 @@ int main(void)
   USBD_Start(&USBD_Device);
 
     /* Configure the CAN peripheral */
-  CAN_Config();
+  //CAN_Config();
 
   /* Infinite loop */
   while (1)

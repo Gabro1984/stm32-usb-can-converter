@@ -38,7 +38,7 @@
 #define USBD_DEBUG_LEVEL                      0
 
 /* TODO: set correct command and report size*/
-#define USBD_CUSTOMHID_OUTREPORT_BUF_SIZE     9
+#define USBD_CUSTOMHID_OUTREPORT_BUF_SIZE     64
 #define USBD_CUSTOM_HID_REPORT_DESC_SIZE       32
 
 /* Exported macro ------------------------------------------------------------*/

@@ -1,8 +1,12 @@
 #include "bsp.h"
 
-GPIO_TypeDef* LED_PORT[LEDn] = {LED1_GPIO_PORT};
+GPIO_TypeDef* LED_PORT[LEDn] = {LED1_GPIO_PORT,
+                                LED2_GPIO_PORT,
+                                LED3_GPIO_PORT};
 
-const uint16_t LED_PIN[LEDn] = {LED1_PIN};
+const uint16_t LED_PIN[LEDn] = {LED1_PIN,
+                                LED2_PIN,
+                                LED3_PIN};
 
 /**
   * @brief  Configures LED GPIO.
@@ -18,7 +22,7 @@ void BSP_LED_Init(Led_TypeDef Led)
   GPIO_InitTypeDef  gpioinitstruct = {0};
 
   /* Enable the GPIO_LED clock */
-  LED1_GPIO_CLK_ENABLE();
+  LED_GPIO_CLK_ENABLE();
 
   /* Configure the GPIO_LED pin */
   gpioinitstruct.Pin    = LED_PIN[Led];

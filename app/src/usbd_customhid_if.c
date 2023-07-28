@@ -72,8 +72,6 @@ USBD_CUSTOM_HID_ItfTypeDef USBD_CustomHID_fops = {
   */
 static int8_t CustomHID_Init(void)
 {
-  /* Configure LED */
-  BSP_LED_Init(LED1);
 
   return (0);
 }

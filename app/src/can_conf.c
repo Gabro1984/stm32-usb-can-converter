@@ -10,6 +10,72 @@ CAN_RxHeaderTypeDef   RxHeader;
 uint8_t               RxData[8];
 
 /**
+ * @brief CAN MSP Initialization
+ *        This function configures the hardware resources used in this example:
+ *           - Peripheral's clock enable
+ *           - Peripheral's GPIO Configuration
+ *           - NVIC configuration for DMA interrupt request enable
+ * @param hcan: CAN handle pointer
+ * @retval None
+ */
+void HAL_CAN_MspInit(CAN_HandleTypeDef *hcan)
+{
+    GPIO_InitTypeDef   GPIO_InitStruct;
+
+    /*##-1- Enable peripherals and GPIO Clocks #################################*/
+    /* CAN1 Periph clock enable */
+    CANx_CLK_ENABLE();
+    /* Enable GPIO clock ****************************************/
+    CANx_GPIO_CLK_ENABLE();
+    /* Enable AFIO clock and Remap CAN PINs to PB8 and PB9*******/
+    CANx_AFIO_REMAP_CLK_ENABLE();
+    CANx_AFIO_REMAP_RX_TX_PIN();
+
+    /*##-2- Configure peripheral GPIO ##########################################*/
+    /* CAN1 TX GPIO pin configuration */
+    GPIO_InitStruct.Pin = CANx_TX_PIN;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+
+    HAL_GPIO_Init(CANx_TX_GPIO_PORT, &GPIO_InitStruct);
+
+    /* CAN1 RX GPIO pin configuration */
+    GPIO_InitStruct.Pin = CANx_RX_PIN;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+
+    HAL_GPIO_Init(CANx_RX_GPIO_PORT, &GPIO_InitStruct);
+
+    /* NVIC configuration for CAN1 Reception complete interrupt */
+    HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 1, 0);
+    HAL_NVIC_EnableIRQ(CAN1_RX0_IRQn);
+}
+// CAN1_RX0_IRQn
+/**
+ * @brief CAN MSP De-Initialization
+ *        This function frees the hardware resources used in this example:
+ *          - Disable the Peripheral's clock
+ *          - Revert GPIO to their default state
+ * @param hcan: CAN handle pointer
+ * @retval None
+ */
+void HAL_CAN_MspDeInit(CAN_HandleTypeDef *hcan)
+{
+    /*##-1- Reset peripherals ##################################################*/
+    CANx_FORCE_RESET();
+    CANx_RELEASE_RESET();
+
+    /* De-initialize the CAN1 TX GPIO pin */
+    HAL_GPIO_DeInit(CANx_TX_GPIO_PORT, CANx_TX_PIN);
+    /* De-initialize the CAN1 RX GPIO pin */
+    HAL_GPIO_DeInit(CANx_RX_GPIO_PORT, CANx_RX_PIN);
+
+    HAL_NVIC_DisableIRQ(CAN1_RX0_IRQn);
+}
+
+/**
  * @brief  Configures the CAN.
  * @param  None
  * @retval None

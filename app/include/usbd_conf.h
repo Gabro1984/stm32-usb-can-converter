@@ -50,7 +50,9 @@
 void *USBD_static_malloc(uint32_t size);
 void USBD_static_free(void *p);
 
-#define MAX_STATIC_ALLOC_SIZE     10 /* Custom HID Class Driver Structure size */
+/* TODO: adapt to size of report size, in production the size of data must be 9 byte
+ instead 64 byte*/
+#define MAX_STATIC_ALLOC_SIZE     21 /* Custom HID Class Driver Structure size */
 
 #define USBD_malloc               (uint32_t *)USBD_static_malloc
 #define USBD_free                 USBD_static_free

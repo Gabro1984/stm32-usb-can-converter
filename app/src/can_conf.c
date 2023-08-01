@@ -108,10 +108,10 @@ void CAN_Config(void)
 
     /* Configure the CAN Filter */
     sFilterConfig.FilterBank = 0;
-    sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+    sFilterConfig.FilterMode = CAN_FILTERMODE_IDLIST;
     sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-    sFilterConfig.FilterIdHigh = 0x0000;
-    sFilterConfig.FilterIdLow = 0x0000;
+    sFilterConfig.FilterIdHigh = LISTEN_CAN_DEVICE_ID_1;
+    sFilterConfig.FilterIdLow = LISTEN_CAN_DEVICE_ID_1;
     sFilterConfig.FilterMaskIdHigh = 0x0000;
     sFilterConfig.FilterMaskIdLow = 0x0000;
     sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;

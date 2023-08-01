@@ -32,6 +32,9 @@
 #define CANx_RX_IRQn                   USB_LP_CAN1_RX0_IRQn
 #define CANx_RX_IRQHandler             USB_LP_CAN1_RX0_IRQHandler
 
+/* Listen device ID*/
+#define    LISTEN_CAN_DEVICE_ID_1 0x18010102
+
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
     void CAN_Config(void);

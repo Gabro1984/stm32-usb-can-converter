@@ -73,7 +73,7 @@ int main(void)
   USBD_Start(&USBD_Device);
 
     /* Configure the CAN peripheral */
-  //CAN_Config();
+  CAN_Config();
 
   /* Infinite loop */
   while (1)

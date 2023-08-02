@@ -29,11 +29,13 @@
 #define CANx_AFIO_REMAP_RX_TX_PIN()    __HAL_AFIO_REMAP_CAN1_2()
 
 /* Definition for CAN's NVIC */
+/* TODO: propably can be removed*/
 #define CANx_RX_IRQn                   USB_LP_CAN1_RX0_IRQn
 #define CANx_RX_IRQHandler             USB_LP_CAN1_RX0_IRQHandler
 
 /* Listen device ID*/
-#define    LISTEN_CAN_DEVICE_ID_1 0x18010102
+#define    LISTEN_CAN_DEVICE_ID_1 ((uint32_t)0x18000002)
+#define    LISTEN_CAN_DEVICE_ID_2 ((uint32_t)0x18FAAF52)
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */

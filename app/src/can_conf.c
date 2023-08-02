@@ -89,7 +89,7 @@ void CAN_Config(void)
 
     /* TODO: customize can config */
     CanHandle.Init.TimeTriggeredMode = DISABLE;
-    CanHandle.Init.AutoBusOff = DISABLE;
+    CanHandle.Init.AutoBusOff = ENABLE;
     CanHandle.Init.AutoWakeUp = DISABLE;
     CanHandle.Init.AutoRetransmission = ENABLE;
     CanHandle.Init.ReceiveFifoLocked = DISABLE;
@@ -111,13 +111,18 @@ void CAN_Config(void)
     }
 
     /* Configure the CAN Filter */
+    /* Filter register format:
+     High: STD_ID[10:0] | EXT_ID[17:13]
+     Low: EXT_ID[12:0] | IDE | RTR | 0
+     Note: IDE must be "1" for 29-bit address
+*/
     sFilterConfig.FilterBank = 0;
     sFilterConfig.FilterMode = CAN_FILTERMODE_IDLIST;
     sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-    sFilterConfig.FilterIdHigh = LISTEN_CAN_DEVICE_ID_1;
-    sFilterConfig.FilterIdLow = LISTEN_CAN_DEVICE_ID_1;
-    sFilterConfig.FilterMaskIdHigh = LISTEN_CAN_DEVICE_ID_2;
-    sFilterConfig.FilterMaskIdLow = LISTEN_CAN_DEVICE_ID_2;
+    sFilterConfig.FilterIdHigh =  (uint16_t)(LISTEN_CAN_DEVICE_ID_1 >> 13);
+    sFilterConfig.FilterIdLow =  (uint16_t)(LISTEN_CAN_DEVICE_ID_1 << 3) | 0x04;
+    sFilterConfig.FilterMaskIdHigh = (uint16_t)(LISTEN_CAN_DEVICE_ID_2 >> 13);
+    sFilterConfig.FilterMaskIdLow = (uint16_t)(LISTEN_CAN_DEVICE_ID_2 << 3) | 0x04;
     sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
     sFilterConfig.FilterActivation = ENABLE;
     sFilterConfig.SlaveStartFilterBank = 14;

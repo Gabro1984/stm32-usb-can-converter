@@ -95,10 +95,14 @@ void CAN_Config(void)
     CanHandle.Init.ReceiveFifoLocked = DISABLE;
     CanHandle.Init.TransmitFifoPriority = DISABLE;
     CanHandle.Init.Mode = CAN_MODE_NORMAL;
+    /* CAN_baud_rate = 250kHz,
+       T_quantum = APB1_clk/Prescaler = 36MHz/12 number of APB1 clk in one time quantum)
+       BitTime = SyncJumpWidth + TimeSeg1 + TimeSeg2 = 12 * T_quantum
+*/
     CanHandle.Init.SyncJumpWidth = CAN_SJW_1TQ;
-    CanHandle.Init.TimeSeg1 = CAN_BS1_6TQ;
-    CanHandle.Init.TimeSeg2 = CAN_BS2_2TQ;
-    CanHandle.Init.Prescaler = 4;
+    CanHandle.Init.TimeSeg1 = CAN_BS1_8TQ;
+    CanHandle.Init.TimeSeg2 = CAN_BS2_3TQ;
+    CanHandle.Init.Prescaler = 12;
 
     if (HAL_CAN_Init(&CanHandle) != HAL_OK)
     {
@@ -112,8 +116,8 @@ void CAN_Config(void)
     sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
     sFilterConfig.FilterIdHigh = LISTEN_CAN_DEVICE_ID_1;
     sFilterConfig.FilterIdLow = LISTEN_CAN_DEVICE_ID_1;
-    sFilterConfig.FilterMaskIdHigh = 0x0000;
-    sFilterConfig.FilterMaskIdLow = 0x0000;
+    sFilterConfig.FilterMaskIdHigh = LISTEN_CAN_DEVICE_ID_2;
+    sFilterConfig.FilterMaskIdLow = LISTEN_CAN_DEVICE_ID_2;
     sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
     sFilterConfig.FilterActivation = ENABLE;
     sFilterConfig.SlaveStartFilterBank = 14;

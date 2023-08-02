@@ -4,7 +4,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
-//#include "bsp.h"
+#include "usbd_conf.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
@@ -33,9 +33,12 @@
 #define CANx_RX_IRQn                   USB_LP_CAN1_RX0_IRQn
 #define CANx_RX_IRQHandler             USB_LP_CAN1_RX0_IRQHandler
 
-/* Listen device ID*/
+/* List of CAN ID*/
+#define    CAN_DEVICE_ID          ((uint32_t)0x18000001)
 #define    LISTEN_CAN_DEVICE_ID_1 ((uint32_t)0x18000002)
 #define    LISTEN_CAN_DEVICE_ID_2 ((uint32_t)0x18FAAF52)
+
+#define    CAN_DATA_LENGTH 8U
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */

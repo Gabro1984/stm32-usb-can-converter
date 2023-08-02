@@ -33,6 +33,11 @@
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
+#define TRANSMIT_TO_CAN    1
+#define  GET_FROM_CAN_ID_1 2
+#define INFO_REQUEST       3
+#define INFO_RESPONSE      4
+#define  GET_FROM_CAN_ID_2 5
 /* Exported functions ------------------------------------------------------- */
 
 #endif /* __MAIN_H */

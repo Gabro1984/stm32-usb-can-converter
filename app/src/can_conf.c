@@ -1,13 +1,14 @@
 #include "stm32f1xx_hal.h"
 #include "bsp.h"
 #include "can_conf.h"
+#include "usbd_customhid.h"
+#include "main.h"
+
+extern USBD_HandleTypeDef USBD_Device;
 
 CAN_HandleTypeDef     CanHandle;
-CAN_TxHeaderTypeDef   TxHeader;
 CAN_RxHeaderTypeDef   RxHeader;
-
-// TODO: customize rx size
-uint8_t               RxData[8];
+uint8_t               RxData[CAN_DATA_LENGTH];
 
 /**
  * @brief CAN MSP Initialization
@@ -22,7 +23,6 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef *hcan)
 {
     GPIO_InitTypeDef   GPIO_InitStruct;
 
-    /*##-1- Enable peripherals and GPIO Clocks #################################*/
     /* CAN1 Periph clock enable */
     CANx_CLK_ENABLE();
     /* Enable GPIO clock ****************************************/
@@ -31,7 +31,6 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef *hcan)
     CANx_AFIO_REMAP_CLK_ENABLE();
     CANx_AFIO_REMAP_RX_TX_PIN();
 
-    /*##-2- Configure peripheral GPIO ##########################################*/
     /* CAN1 TX GPIO pin configuration */
     GPIO_InitStruct.Pin = CANx_TX_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -52,7 +51,7 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef *hcan)
     HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(CAN1_RX0_IRQn);
 }
-// CAN1_RX0_IRQn
+
 /**
  * @brief CAN MSP De-Initialization
  *        This function frees the hardware resources used in this example:
@@ -146,14 +145,6 @@ void CAN_Config(void)
 	/* Notification Error */
 	Error_Handler();
     }
-
-    /* Configure Transmission process */
-    TxHeader.StdId = 0x321;
-    TxHeader.ExtId = 0x01;
-    TxHeader.RTR = CAN_RTR_DATA;
-    TxHeader.IDE = CAN_ID_STD;
-    TxHeader.DLC = 2;
-    TxHeader.TransmitGlobalTime = DISABLE;
 }
 
 /**
@@ -164,20 +155,29 @@ void CAN_Config(void)
  */
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *CanHandle)
 {
+    /* TODO: adjust message size */
+    uint8_t DataToHID[64] = {0};
+
     /* Get RX message */
     if (HAL_CAN_GetRxMessage(CanHandle, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
+	return;
+
+    if ((RxHeader.IDE == CAN_ID_EXT) && (RxHeader.DLC == CAN_DATA_LENGTH))
     {
-	/* Reception Error */
-	Error_Handler();
+	BSP_LED_Toggle(LED3);
+
+	switch(RxHeader.ExtId) {
+	case LISTEN_CAN_DEVICE_ID_1:
+	    DataToHID[0] = GET_FROM_CAN_ID_1;
+	    break;
+	case LISTEN_CAN_DEVICE_ID_2:
+	    DataToHID[0] = GET_FROM_CAN_ID_2;
+	    break;
+	default:
+	    return;
+	};
+
+	memcpy(DataToHID+1, RxData, sizeof(RxData));
+	USBD_CUSTOM_HID_SendReport(&USBD_Device, DataToHID, 64);
     }
-
-    /* TODO: process received data*/
-
-    /* TODO: remove */
-    /* /\* Display LEDx *\/ */
-    /* if ((RxHeader.StdId == 0x321) && (RxHeader.IDE == CAN_ID_STD) && (RxHeader.DLC == 2)) */
-    /* { */
-    /* 	LED_Display(RxData[0]); */
-    /* 	ubKeyNumber = RxData[0]; */
-    /* } */
 }

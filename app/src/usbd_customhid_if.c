@@ -18,6 +18,8 @@
 
 /* Includes ------------------------------------------------------------------ */
 #include "usbd_customhid_if.h"
+#include "can_conf.h"
+#include "main.h"
 
 /* Private typedef ----------------------------------------------------------- */
 /* Private define ------------------------------------------------------------ */
@@ -28,6 +30,8 @@ static int8_t CustomHID_DeInit(void);
 static int8_t CustomHID_OutEvent(uint8_t cmd, uint8_t *data);
 /* Private variables --------------------------------------------------------- */
 extern USBD_HandleTypeDef USBD_Device;
+extern CAN_HandleTypeDef     CanHandle;
+
 
 __ALIGN_BEGIN static uint8_t
   CustomHID_ReportDesc[USBD_CUSTOM_HID_REPORT_DESC_SIZE] __ALIGN_END = {
@@ -96,9 +100,29 @@ static int8_t CustomHID_DeInit(void)
   * @param  cmd: packet designation
   * @param  data: packet payload
   */
-/* TODO: add logic */
 static int8_t CustomHID_OutEvent(uint8_t cmd, uint8_t *data)
 {
+    CAN_TxHeaderTypeDef   TxHeader;
+    uint32_t              TxMailbox;
+
+    /* Configure Transmission process */
+    TxHeader.StdId = 0;
+    TxHeader.ExtId = CAN_DEVICE_ID;
+    TxHeader.RTR = CAN_RTR_DATA;
+    TxHeader.IDE = CAN_ID_EXT;
+    TxHeader.DLC = CAN_DATA_LENGTH;
+    TxHeader.TransmitGlobalTime = DISABLE;
+
+    BSP_LED_Toggle(LED3);
+
+    switch(cmd) {
+    case TRANSMIT_TO_CAN:
+	HAL_CAN_AddTxMessage(&CanHandle, &TxHeader, data, &TxMailbox);
+	break;
+    case INFO_REQUEST:
+	/* TODO: device info response */
+	break;
+    };
 
   return (0);
 }

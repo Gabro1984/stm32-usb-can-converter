@@ -178,6 +178,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *CanHandle)
 	};
 
 	memcpy(DataToHID+1, RxData, sizeof(RxData));
-	USBD_CUSTOM_HID_SendReport(&USBD_Device, DataToHID, 64);
+	USBD_CUSTOM_HID_SendReport(&USBD_Device, DataToHID, sizeof(DataToHID));
     }
 }

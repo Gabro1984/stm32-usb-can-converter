@@ -24,6 +24,9 @@
 #define USB_DISCONNECT_PORT                 GPIOB
 #define USB_DISCONNECT_PIN                  GPIO_PIN_14
 
+extern DevInfo info;
+extern USBD_HandleTypeDef USBD_Device;
+
 /* Private macro ------------------------------------------------------------- */
 /* Private variables --------------------------------------------------------- */
 PCD_HandleTypeDef hpcd;
@@ -118,8 +121,30 @@ void HAL_PCD_DataOutStageCallback(PCD_HandleTypeDef * hpcd, uint8_t epnum)
   */
 void HAL_PCD_DataInStageCallback(PCD_HandleTypeDef * hpcd, uint8_t epnum)
 {
+    /* TODO: adjust repsponze length */
+    uint8_t Response[64] = {0};
+
   USBD_LL_DataInStage((USBD_HandleTypeDef *) hpcd->pData, epnum,
                       hpcd->IN_ep[epnum].xfer_buff);
+
+/* Proccess device info response */
+  if (info.block_num > INFO_BLOCK_CNT)
+  {
+    info.tx_in_progress = 0;
+    info.block_num = 0;
+    return;
+  }
+
+  if (info.tx_in_progress)
+  {
+      Response[0] = INFO_RESPONSE;
+      Response[1] = 1;
+      Response[2] = info.block_num;
+      memcpy(Response+3, info.data + (info.block_num - 1) * INFO_BLOCK_DATA_SIZE,
+	     INFO_BLOCK_DATA_SIZE);
+      USBD_CUSTOM_HID_SendReport(&USBD_Device, Response, sizeof(Response));
+      ++info.block_num;
+  }
 }
 
 /**

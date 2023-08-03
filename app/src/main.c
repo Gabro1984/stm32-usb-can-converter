@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    USB_Device/CustomHID_Standalone/Src/main.c 
+  * @file    USB_Device/CustomHID_Standalone/Src/main.c
   * @author  MCD Application Team
   * @brief   USB device CustomHID application main file.
   ******************************************************************************
@@ -33,9 +33,11 @@
 /* Private macro ------------------------------------------------------------- */
 /* Private variables --------------------------------------------------------- */
 USBD_HandleTypeDef USBD_Device;
+DevInfo info;
 
 /* Private function prototypes ----------------------------------------------- */
 void SystemClock_Config(void);
+void GetDeviceInfo(void);
 
 /* Private functions --------------------------------------------------------- */
 
@@ -46,7 +48,7 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. 
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick.
    */
   HAL_Init();
 
@@ -56,6 +58,9 @@ int main(void)
   BSP_LED_Init(LED1);
   BSP_LED_Init(LED2);
   BSP_LED_Init(LED3);
+
+  /* Fill DevInfo structure */
+  GetDeviceInfo();
 
   /* TODO: hack for debug purposes. Need to remove in production.*/
   TURN_ON_USB_DEVICE();
@@ -85,7 +90,7 @@ int main(void)
 
 /**
   * @brief  System Clock Configuration
-  *         The system Clock is configured as follow : 
+  *         The system Clock is configured as follow :
   *            System Clock source            = PLL (HSE)
   *            SYSCLK(Hz)                     = 72000000
   *            HCLK(Hz)                       = 72000000
@@ -141,6 +146,50 @@ void SystemClock_Config(void)
   }
 }
 
+void GetDeviceInfo()
+{
+    uint32_t dev_id_0, dev_id_1, dev_id_2;
+
+    dev_id_0     = *(uint32_t*)DEVICE_ID1;
+    dev_id_1     = *(uint32_t*)DEVICE_ID2;
+    dev_id_2     = *(uint32_t*)DEVICE_ID3;
+
+    info.data[0]  = (uint8_t)((dev_id_0 >> 24) & 0xFF);
+    info.data[1]  = (uint8_t)((dev_id_0 >> 16) & 0xFF);
+    info.data[2]  = (uint8_t)((dev_id_0 >> 8) & 0xFF);
+    info.data[3]  = (uint8_t)((dev_id_0) & 0xFF);
+    info.data[4]  = (uint8_t)((dev_id_1 >> 24) & 0xFF);
+    info.data[5]  = (uint8_t)((dev_id_1 >> 16) & 0xFF);
+    info.data[6]  = (uint8_t)((dev_id_1 >> 8) & 0xFF);
+    info.data[7]  = (uint8_t)((dev_id_1) & 0xFF);
+    info.data[8]  = (uint8_t)((dev_id_2 >> 24) & 0xFF);
+    info.data[9]  = (uint8_t)((dev_id_2 >> 16) & 0xFF);
+    info.data[10]  = (uint8_t)((dev_id_2 >> 8) & 0xFF);
+    info.data[11]  = (uint8_t)((dev_id_2) & 0xFF);
+
+    info.data[12]  = (uint8_t)((SW_VER >> 24) & 0xFF);
+    info.data[13]  = (uint8_t)((SW_VER >> 16) & 0xFF);
+    info.data[14]  = (uint8_t)((SW_VER >> 8) & 0xFF);
+    info.data[15]  = (uint8_t)((SW_VER) & 0xFF);
+}
+
+void SendInfo()
+{
+    /* TODO: adjust repsponze length */
+    uint8_t Response[64] = {0};
+
+    info.tx_in_progress = 1;
+    info.block_num = 1;
+
+    Response[0] = INFO_RESPONSE;
+    Response[1] = 1;
+    Response[2] = info.block_num;
+    memcpy(Response+3, info.data, INFO_BLOCK_DATA_SIZE);
+
+    USBD_CUSTOM_HID_SendReport(&USBD_Device, Response, sizeof(Response));
+    ++info.block_num;
+}
+
 #ifdef  USE_FULL_ASSERT
 
 /**
@@ -153,7 +202,7 @@ void SystemClock_Config(void)
 void assert_failed(uint8_t * file, uint32_t line)
 {
   /* User can add his own implementation to report the file name and line
-   * number, ex: printf("Wrong parameters value: file %s on line %d\r\n", file, 
+   * number, ex: printf("Wrong parameters value: file %s on line %d\r\n", file,
    * line) */
 
   /* Infinite loop */

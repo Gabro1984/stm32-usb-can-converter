@@ -26,18 +26,31 @@
 #include "usbd_core.h"
 #include "stm32f1xx_hal_pcd.h"
 #include "usbd_desc.h"
-/* #include "usbd_customhid.h" */
 #include "usbd_customhid_if.h"
 #include "can_conf.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
+#define SW_VER 0x01020304
+
 #define TRANSMIT_TO_CAN    1
 #define  GET_FROM_CAN_ID_1 2
 #define INFO_REQUEST       3
 #define INFO_RESPONSE      4
 #define  GET_FROM_CAN_ID_2 5
+
+#define DEV_INFO_SIZE 16
+#define INFO_BLOCK_CNT 3
+#define INFO_BLOCK_DATA_SIZE 6
+
+typedef struct DeviceInfo {
+    uint8_t data[DEV_INFO_SIZE];
+    uint8_t tx_in_progress;
+    uint8_t block_num;
+} DevInfo;
+
 /* Exported functions ------------------------------------------------------- */
+void SendInfo(void);
 
 #endif /* __MAIN_H */

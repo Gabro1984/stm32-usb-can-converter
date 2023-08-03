@@ -40,6 +40,8 @@
 
 #define    CAN_DATA_LENGTH 8U
 
+#define    CAN_ERROR_NOTIFY_TIMEOUT 500U
+
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
     void CAN_Config(void);

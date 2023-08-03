@@ -139,8 +139,12 @@ void CAN_Config(void)
 	Error_Handler();
     }
 
-    /* Activate CAN RX notification */
-    if (HAL_CAN_ActivateNotification(&CanHandle, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
+    /* Activate CAN RX0 and errors notifications */
+    if (HAL_CAN_ActivateNotification(&CanHandle,
+				     CAN_IT_RX_FIFO0_MSG_PENDING|
+				     CAN_IT_ERROR |
+				     CAN_IT_BUSOFF |
+				     CAN_IT_LAST_ERROR_CODE) != HAL_OK)
     {
 	/* Notification Error */
 	Error_Handler();
@@ -179,5 +183,37 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *CanHandle)
 
 	memcpy(DataToHID+1, RxData, sizeof(RxData));
 	USBD_CUSTOM_HID_SendReport(&USBD_Device, DataToHID, sizeof(DataToHID));
+    }
+}
+
+/**
+  * @brief  Error CAN callback.
+  * @param  hcan pointer to a CAN_HandleTypeDef structure that contains
+  *         the configuration information for the specified CAN.
+  * @retval None
+  */
+void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
+{
+    static uint32_t tickstart;
+    /* TODO: adjust message size */
+    uint8_t DataToHID[64] = {0};
+
+    if(!tickstart)
+	tickstart = HAL_GetTick();
+
+    uint32_t error = HAL_CAN_GetError(hcan);
+
+    if((HAL_GetTick() - tickstart) > CAN_ERROR_NOTIFY_TIMEOUT )
+    {
+	DataToHID[0] = INFO_RESPONSE;
+	DataToHID[1] = 0x0F;
+	DataToHID[2]  = (uint8_t)((error >> 24) & 0xFF);
+	DataToHID[3]  = (uint8_t)((error >> 16) & 0xFF);
+	DataToHID[4]  = (uint8_t)((error >> 8) & 0xFF);
+	DataToHID[5]  = (uint8_t)((error) & 0xFF);
+
+	USBD_CUSTOM_HID_SendReport(&USBD_Device, DataToHID, sizeof(DataToHID));
+
+	tickstart  = HAL_GetTick();
     }
 }

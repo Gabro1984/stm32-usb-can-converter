@@ -127,7 +127,9 @@ void HAL_PCD_DataInStageCallback(PCD_HandleTypeDef * hpcd, uint8_t epnum)
   USBD_LL_DataInStage((USBD_HandleTypeDef *) hpcd->pData, epnum,
                       hpcd->IN_ep[epnum].xfer_buff);
 
-/* Proccess device info response */
+/* Proccess device info response in several passes,
+   because info length 16 bytes not fit in custom HID packet
+*/
   if (info.block_num > INFO_BLOCK_CNT)
   {
     info.tx_in_progress = 0;

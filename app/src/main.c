@@ -176,7 +176,7 @@ void GetDeviceInfo()
 void SendInfo()
 {
     /* TODO: adjust repsponze length */
-    uint8_t Response[64] = {0};
+    uint8_t Response[MSG_LENGTH] = {0};
 
     info.tx_in_progress = 1;
     info.block_num = 1;

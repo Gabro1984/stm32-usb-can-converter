@@ -122,7 +122,7 @@ void HAL_PCD_DataOutStageCallback(PCD_HandleTypeDef * hpcd, uint8_t epnum)
 void HAL_PCD_DataInStageCallback(PCD_HandleTypeDef * hpcd, uint8_t epnum)
 {
     /* TODO: adjust repsponze length */
-    uint8_t Response[64] = {0};
+    uint8_t Response[MSG_LENGTH] = {0};
 
   USBD_LL_DataInStage((USBD_HandleTypeDef *) hpcd->pData, epnum,
                       hpcd->IN_ep[epnum].xfer_buff);

@@ -8,7 +8,7 @@ extern USBD_HandleTypeDef USBD_Device;
 
 CAN_HandleTypeDef     CanHandle;
 CAN_RxHeaderTypeDef   RxHeader;
-uint8_t               RxData[CAN_DATA_LENGTH];
+uint8_t               RxData[DATA_LENGTH];
 
 /**
  * @brief CAN MSP Initialization
@@ -160,13 +160,13 @@ void CAN_Config(void)
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *CanHandle)
 {
     /* TODO: adjust message size */
-    uint8_t DataToHID[64] = {0};
+    uint8_t DataToHID[MSG_LENGTH] = {0};
 
     /* Get RX message */
     if (HAL_CAN_GetRxMessage(CanHandle, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
 	return;
 
-    if ((RxHeader.IDE == CAN_ID_EXT) && (RxHeader.DLC == CAN_DATA_LENGTH))
+    if ((RxHeader.IDE == CAN_ID_EXT) && (RxHeader.DLC == DATA_LENGTH))
     {
 	BSP_LED_Toggle(LED3);
 
@@ -196,7 +196,7 @@ void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
 {
     static uint32_t tickstart;
     /* TODO: adjust message size */
-    uint8_t DataToHID[64] = {0};
+    uint8_t DataToHID[MSG_LENGTH] = {0};
 
     if(!tickstart)
 	tickstart = HAL_GetTick();

@@ -39,7 +39,7 @@
 
 /* TODO: set correct command and report size*/
 #define USBD_CUSTOMHID_OUTREPORT_BUF_SIZE     64
-#define USBD_CUSTOM_HID_REPORT_DESC_SIZE       32
+#define USBD_CUSTOM_HID_REPORT_DESC_SIZE       26
 
 /* Exported macro ------------------------------------------------------------*/
 /* Memory management macros */

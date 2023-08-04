@@ -43,7 +43,7 @@ extern "C" {
   */
 #define CUSTOM_HID_EPIN_ADDR                 0x81U
 /* TODO: adapt to 9 byte packet size in production*/
-#define CUSTOM_HID_EPIN_SIZE                 0x40U
+#define CUSTOM_HID_EPIN_SIZE                 0x9U
 
 #define CUSTOM_HID_EPOUT_ADDR                0x01U
 /* TODO: adapt to 9 byte packet size in production*/

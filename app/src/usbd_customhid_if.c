@@ -35,7 +35,7 @@ extern CAN_HandleTypeDef     CanHandle;
 
 __ALIGN_BEGIN static uint8_t
   CustomHID_ReportDesc[USBD_CUSTOM_HID_REPORT_DESC_SIZE] __ALIGN_END = {
-  0x06, 0xFF, 0x00,             /* USAGE_PAGE (Vendor Page: 0xFF00) */
+  0x06, 0x00, 0xFF,             /* USAGE_PAGE (Vendor Page: 0xFF00) */
   0x09, 0x01,                   /* USAGE (Demo Kit) */
   0xa1, 0x01,                   /* COLLECTION (Application) */
   /* 6 */
@@ -43,18 +43,14 @@ __ALIGN_BEGIN static uint8_t
   0x15, 0x00,                            /*     LOGICAL_MINIMUM (0)        */
   0x25, 0xFF,                            /*     LOGICAL_MAXIMUM (255)        */
   0x75, 0x08,                            /*     REPORT_SIZE (8)            */
-  0x95, 64,                            /*     REPORT_COUNT (64)           */
 
-  0x09, 0x01,
-  0x81, 0x02,
-  0x95, 64,
+  0x95, CUSTOM_HID_EPIN_SIZE,                                 /*   REPORT_COUNT (9)           */
+  0x09, 0x01,                            /*   USAGE (Vendor Usage 1)  */
+  0x81, 0x00,                            /*   INPUT (Data,Ary,Abs) */
 
-  0x09, 0x01,
-  0x91, 0x02,
-  0x95, 0x01,
-
-  0x09, 0x01,
-  0xB1, 0x02,
+  0x95, 64,                                 /*   REPORT_COUNT (64)           */
+  0x09, 0x01,                            /*   USAGE (Vendor Usage 1)  */
+  0x91, 0x00,                            /*   OUTPUT (Data,Ary,Abs) */
 
   0xc0                          /* END_COLLECTION */
 };
@@ -110,7 +106,7 @@ static int8_t CustomHID_OutEvent(uint8_t cmd, uint8_t *data)
     TxHeader.ExtId = CAN_DEVICE_ID;
     TxHeader.RTR = CAN_RTR_DATA;
     TxHeader.IDE = CAN_ID_EXT;
-    TxHeader.DLC = CAN_DATA_LENGTH;
+    TxHeader.DLC = DATA_LENGTH;
     TxHeader.TransmitGlobalTime = DISABLE;
 
     BSP_LED_Toggle(LED3);

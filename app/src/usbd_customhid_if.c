@@ -128,7 +128,7 @@ static int8_t CustomHID_OutEvent(uint8_t cmd, uint8_t* data)
             HAL_CAN_AddTxMessage(&CanHandle, &TxHeader, data, &TxMailbox);
             break;
         case INFO_REQUEST:
-            SendInfo();
+            SendInfo(data);
             break;
     };
 

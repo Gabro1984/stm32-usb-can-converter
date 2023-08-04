@@ -55,6 +55,6 @@ typedef struct DeviceInfo
 } DevInfo;
 
 /* Exported functions ------------------------------------------------------- */
-void SendInfo(void);
+void SendInfo(uint8_t* data);
 
 #endif /* __MAIN_H */

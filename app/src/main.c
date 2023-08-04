@@ -172,9 +172,13 @@ void GetDeviceInfo()
     info.data[15] = (uint8_t)((SW_VER)&0xFF);
 }
 
-void SendInfo()
+void SendInfo(uint8_t* req_data)
 {
     uint8_t Response[MSG_LENGTH] = {0};
+
+    /* see doc/gateway_hid-can (stm32f105).txt */
+    if (req_data[0] != 0x01)
+        return;
 
     info.tx_in_progress = 1;
     info.block_num      = 1;

@@ -33,6 +33,7 @@
 /* Private variables --------------------------------------------------------- */
 USBD_HandleTypeDef USBD_Device;
 DevInfo            info;
+uint8_t TxBuffer[MSG_LENGTH];
 
 /* Private function prototypes ----------------------------------------------- */
 void SystemClock_Config(void);
@@ -174,8 +175,6 @@ void GetDeviceInfo()
 
 void SendInfo(uint8_t* req_data)
 {
-    uint8_t Response[MSG_LENGTH] = {0};
-
     /* see doc/gateway_hid-can (stm32f105).txt */
     if (req_data[0] != 0x01)
         return;
@@ -183,12 +182,12 @@ void SendInfo(uint8_t* req_data)
     info.tx_in_progress = 1;
     info.block_num      = 1;
 
-    Response[0] = INFO_RESPONSE;
-    Response[1] = 1;
-    Response[2] = info.block_num;
-    memcpy(Response + 3, info.data, INFO_BLOCK_DATA_SIZE);
+    TxBuffer[0] = INFO_RESPONSE;
+    TxBuffer[1] = 1;
+    TxBuffer[2] = info.block_num;
+    memcpy(TxBuffer + 3, info.data, INFO_BLOCK_DATA_SIZE);
 
-    USBD_CUSTOM_HID_SendReport(&USBD_Device, Response, sizeof(Response));
+    USBD_CUSTOM_HID_SendReport(&USBD_Device, TxBuffer, sizeof(TxBuffer));
     ++info.block_num;
 }
 

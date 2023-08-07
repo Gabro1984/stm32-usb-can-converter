@@ -26,6 +26,7 @@
 
 extern DevInfo            info;
 extern USBD_HandleTypeDef USBD_Device;
+extern uint8_t TxBuffer[MSG_LENGTH];
 
 /* Private macro ------------------------------------------------------------- */
 /* Private variables --------------------------------------------------------- */
@@ -119,8 +120,6 @@ void HAL_PCD_DataOutStageCallback(PCD_HandleTypeDef* hpcd, uint8_t epnum)
  */
 void HAL_PCD_DataInStageCallback(PCD_HandleTypeDef* hpcd, uint8_t epnum)
 {
-    uint8_t Response[MSG_LENGTH] = {0};
-
     USBD_LL_DataInStage((USBD_HandleTypeDef*)hpcd->pData, epnum, hpcd->IN_ep[epnum].xfer_buff);
 
     /* Proccess device info response in several passes,
@@ -135,13 +134,13 @@ void HAL_PCD_DataInStageCallback(PCD_HandleTypeDef* hpcd, uint8_t epnum)
 
     if (info.tx_in_progress)
     {
-        Response[0] = INFO_RESPONSE;
-        Response[1] = 1;
-        Response[2] = info.block_num;
-        memcpy(Response + 3,
+        TxBuffer[0] = INFO_RESPONSE;
+        TxBuffer[1] = 1;
+        TxBuffer[2] = info.block_num;
+        memcpy(TxBuffer + 3,
                info.data + (info.block_num - 1) * INFO_BLOCK_DATA_SIZE,
                INFO_BLOCK_DATA_SIZE);
-        USBD_CUSTOM_HID_SendReport(&USBD_Device, Response, sizeof(Response));
+        USBD_CUSTOM_HID_SendReport(&USBD_Device, TxBuffer, sizeof(TxBuffer));
         ++info.block_num;
     }
 }

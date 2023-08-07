@@ -6,6 +6,7 @@
 #include "usbd_customhid.h"
 
 extern USBD_HandleTypeDef USBD_Device;
+extern uint8_t TxBuffer[MSG_LENGTH];
 
 CAN_HandleTypeDef   CanHandle;
 CAN_RxHeaderTypeDef RxHeader;
@@ -158,8 +159,6 @@ void CAN_Config(void)
  */
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef* CanHandle)
 {
-    uint8_t DataToHID[MSG_LENGTH] = {0};
-
     /* Get RX message */
     if (HAL_CAN_GetRxMessage(CanHandle, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
         return;
@@ -171,17 +170,17 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef* CanHandle)
         switch (RxHeader.ExtId)
         {
             case LISTEN_CAN_DEVICE_ID_1:
-                DataToHID[0] = GET_FROM_CAN_ID_1;
+                TxBuffer[0] = GET_FROM_CAN_ID_1;
                 break;
             case LISTEN_CAN_DEVICE_ID_2:
-                DataToHID[0] = GET_FROM_CAN_ID_2;
+                TxBuffer[0] = GET_FROM_CAN_ID_2;
                 break;
             default:
                 return;
         };
 
-        memcpy(DataToHID + 1, RxData, sizeof(RxData));
-        USBD_CUSTOM_HID_SendReport(&USBD_Device, DataToHID, sizeof(DataToHID));
+        memcpy(TxBuffer + 1, RxData, sizeof(RxData));
+        USBD_CUSTOM_HID_SendReport(&USBD_Device, TxBuffer, sizeof(TxBuffer));
     }
 }
 
@@ -194,7 +193,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef* CanHandle)
 void HAL_CAN_ErrorCallback(CAN_HandleTypeDef* hcan)
 {
     static uint32_t tickstart;
-    uint8_t         DataToHID[MSG_LENGTH] = {0};
 
     if (!tickstart)
         tickstart = HAL_GetTick();
@@ -203,14 +201,14 @@ void HAL_CAN_ErrorCallback(CAN_HandleTypeDef* hcan)
 
     if ((HAL_GetTick() - tickstart) > CAN_ERROR_NOTIFY_TIMEOUT)
     {
-        DataToHID[0] = INFO_RESPONSE;
-        DataToHID[1] = 0x0F;
-        DataToHID[2] = (uint8_t)((error >> 24) & 0xFF);
-        DataToHID[3] = (uint8_t)((error >> 16) & 0xFF);
-        DataToHID[4] = (uint8_t)((error >> 8) & 0xFF);
-        DataToHID[5] = (uint8_t)((error)&0xFF);
+        TxBuffer[0] = INFO_RESPONSE;
+        TxBuffer[1] = 0x0F;
+        TxBuffer[2] = (uint8_t)((error >> 24) & 0xFF);
+        TxBuffer[3] = (uint8_t)((error >> 16) & 0xFF);
+        TxBuffer[4] = (uint8_t)((error >> 8) & 0xFF);
+        TxBuffer[5] = (uint8_t)((error)&0xFF);
 
-        USBD_CUSTOM_HID_SendReport(&USBD_Device, DataToHID, sizeof(DataToHID));
+        USBD_CUSTOM_HID_SendReport(&USBD_Device, TxBuffer, sizeof(TxBuffer));
 
         tickstart = HAL_GetTick();
     }
